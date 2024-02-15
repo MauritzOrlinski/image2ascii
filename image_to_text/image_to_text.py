@@ -42,13 +42,13 @@ def compress_colors(image, width, height):
     return np.array(average_brightness)
 
 
-def make_text(image, image_brightness, width, height=None, colorful=True, extended_chars=0):
+def make_text(image, image_brightness, width, height=None, colorful=True, extended_chars=0, luminosity=True):
     text_array = []
     if width > image_brightness.shape[1]:
         width = image_brightness.shape[1]
 
     if height is None:
-        height = int((width * image_brightness.shape[1] / image_brightness.shape[0]))
+        height = math.ceil((width * image_brightness.shape[1] / image_brightness.shape[0]))
 
     compressed_image = compress(image_brightness, width, height)
     compressed_colors = compress_colors(image, width, height)
@@ -65,7 +65,7 @@ def make_text(image, image_brightness, width, height=None, colorful=True, extend
                 text_for_terminal += get_color(compressed_colors[i][j][0], compressed_colors[i][j][1],
                                                compressed_colors[i][j][2])
                 for k in range(extended_chars + 1):
-                    text_for_terminal += "#"
+                    text_for_terminal += text_array[i][j] if luminosity else '#'
                     text_to_file += text_array[i][j]
             else:
                 for k in range(extended_chars + 1):
