@@ -44,11 +44,25 @@ def compress_colors(image, width, height):
 
 def make_text(image, image_brightness, width, height=None, colorful=True, extended_chars=0, luminosity=True):
     text_array = []
-    if width > image_brightness.shape[1]:
-        width = image_brightness.shape[1]
 
     if height is None:
-        height = math.ceil((width * image_brightness.shape[1] / image_brightness.shape[0]))
+        height = math.ceil((width * (image_brightness.shape[1]*2) / image_brightness.shape[0]))
+
+    if height is not None and width is not None:
+        if height > (image_brightness.shape[1]*2) :
+            height = (image_brightness.shape[1]*2)
+
+        if width > image_brightness.shape[0]:
+            width = image_brightness.shape[0]/(extended_chars+1)
+
+        wh = image_brightness.shape[0]/(image_brightness.shape[1]*2)
+        possible_width = height * wh
+        possible_height = width * (extended_chars+1) * 1/wh
+
+        if possible_width/(extended_chars+1) > width:
+            height = int(possible_height)
+        else:
+            width = int(possible_width/(extended_chars+1))
 
     compressed_image = compress(image_brightness, width, height)
     compressed_colors = compress_colors(image, width, height)
@@ -65,7 +79,7 @@ def make_text(image, image_brightness, width, height=None, colorful=True, extend
                 text_for_terminal += get_color(compressed_colors[i][j][0], compressed_colors[i][j][1],
                                                compressed_colors[i][j][2])
                 for k in range(extended_chars + 1):
-                    text_for_terminal += text_array[i][j] if luminosity else '#'
+                    text_for_terminal += text_array[i][j] if luminosity else '█'
                     text_to_file += text_array[i][j]
             else:
                 for k in range(extended_chars + 1):
